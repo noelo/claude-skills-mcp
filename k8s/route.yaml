@@ -1,0 +1,26 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: claude-skills-mcp-backend
+  labels:
+    app: claude-skills-mcp-backend
+spec:
+  to:
+    kind: Service
+    name: claude-skills-mcp-backend
+    weight: 100
+  port:
+    targetPort: http
+  # Uncomment and configure TLS if needed
+  # tls:
+  #   termination: edge
+  #   insecureEdgeTerminationPolicy: Redirect
+  #   # For passthrough TLS:
+  #   # termination: passthrough
+  #   # insecureEdgeTerminationPolicy: None
+  #   # For re-encrypt TLS:
+  #   # termination: reencrypt
+  #   # insecureEdgeTerminationPolicy: Redirect
+  #   # destinationCACertificate: |
+  #   #   <CA certificate for backend service>
+

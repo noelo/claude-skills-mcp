@@ -4,6 +4,16 @@
       "type": "local",
       "path": "/opt/app-root/src/local_skills",
       "comment": "Your custom local skills (optional - directory doesn't need to exist)"
+    },
+    {
+      "type": "github",
+      "url": "https://github.com/anthropics/skills",
+      "comment": "Official Anthropic skills - diverse examples with Python scripts, images, documents"
+    },
+    {
+      "type": "github",
+      "url": "https://github.com/chrisvoncsefalvay/claude-d3js-skill",
+      "comment": "A Claude skill for d3.js."
     }
   ],
   "embedding_model": "all-MiniLM-L6-v2",

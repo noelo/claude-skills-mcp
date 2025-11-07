@@ -1,0 +1,182 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: claude-skills-mcp-backend-config
+  labels:
+    app: claude-skills-mcp-backend
+data:
+  config.json: |
+    {
+      "skill_sources": [
+        {
+          "type": "local",
+          "path": "/opt/app-root/src/local_skills",
+          "comment": "Your custom local skills (optional - directory doesn't need to exist)"
+        },
+        {
+          "type": "github",
+          "url": "https://github.com/anthropics/skills",
+          "comment": "Official Anthropic skills - diverse examples with Python scripts, images, documents"
+        },
+        {
+          "type": "github",
+          "url": "https://github.com/chrisvoncsefalvay/claude-d3js-skill",
+          "comment": "A Claude skill for d3.js."
+        }
+      ],
+      "embedding_model": "all-MiniLM-L6-v2",
+      "default_top_k": 3,
+      "max_skill_content_chars": null,
+      "comment_max_chars": "Set to an integer (e.g., 5000) to truncate skill content, or null for unlimited",
+      "load_skill_documents": true,
+      "comment_load_docs": "Load additional files (scripts, references, assets) from skill directories",
+      "max_image_size_bytes": 5242880,
+      "comment_max_image": "Maximum image file size (5MB). Larger images store URL only",
+      "allowed_image_extensions": [".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp"],
+      "text_file_extensions": [".md", ".py", ".txt", ".json", ".yaml", ".yml", ".sh", ".r", ".ipynb", ".xml"],
+      "auto_update_enabled": true,
+      "auto_update_interval_minutes": 60,
+      "github_api_token": null
+    }
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: claude-skills-mcp-backend-secrets
+  labels:
+    app: claude-skills-mcp-backend
+type: Opaque
+# Optional: Uncomment stringData and set your GitHub token for higher API rate limits
+# stringData:
+#   github-token: "your-github-personal-access-token-here"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: claude-skills-mcp-backend
+  labels:
+    app: claude-skills-mcp-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: claude-skills-mcp-backend
+  template:
+    metadata:
+      labels:
+        app: claude-skills-mcp-backend
+    spec:
+      # Run as non-root user (matches Containerfile USER 1001)
+      containers:
+      - name: backend
+        # Update this image to match your container registry
+        image: quay.io/noeloc/skills-mcp:latest
+        imagePullPolicy: Always
+        ports:
+        - name: http
+          containerPort: 8765
+          protocol: TCP
+        env:
+        - name: CONFIG_FILE
+          value: "/etc/config/config.json"
+        - name: HF_HOME 
+          value: /tmp/
+        # Optional: Uncomment to use GitHub token from secret
+        # - name: GITHUB_API_TOKEN
+        #   valueFrom:
+        #     secretKeyRef:
+        #       name: claude-skills-mcp-backend-secrets
+        #       key: github-token
+        #       optional: true
+        volumeMounts:
+        - name: config
+          mountPath: /etc/config
+          readOnly: true
+        - name: local-skills
+          mountPath: /opt/app-root/src/local_skills
+        # - name: sentence-transformers-cache
+        #   mountPath: /tmp/sentence-transformers
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "2Gi"
+            cpu: "2000m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 90
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+      volumes:
+      - name: config
+        configMap:
+          name: claude-skills-mcp-backend-config
+      - name: local-skills
+        emptyDir: {}
+        # For persistent storage, use PersistentVolumeClaim instead:
+        # persistentVolumeClaim:
+        #   claimName: claude-skills-mcp-backend-storage
+      # - name: sentence-transformers-cache
+      #   persistentVolumeClaim:
+      #     claimName: claude-skills-mcp-backend-cache
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: claude-skills-mcp-backend
+  labels:
+    app: claude-skills-mcp-backend
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8765
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    app: claude-skills-mcp-backend
+---
+# PersistentVolumeClaim for sentence-transformers model cache
+# This stores downloaded embedding models to avoid re-downloading on pod restarts
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: claude-skills-mcp-backend-cache
+  labels:
+    app: claude-skills-mcp-backend
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi  # Models are typically 100-500MB, 2Gi provides headroom
+  # storageClassName: your-storage-class  # Uncomment and set if needed
+---
+# Optional: PersistentVolumeClaim for local skills storage
+# Uncomment and apply if you want persistent storage for local skills
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: claude-skills-mcp-backend-storage
+#   labels:
+#     app: claude-skills-mcp-backend
+# spec:
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 1Gi
+#   # storageClassName: your-storage-class
+
