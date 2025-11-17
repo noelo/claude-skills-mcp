@@ -387,6 +387,15 @@ class SkillsMCPServer:
                     text=f"Skill '{skill_name}' not found. Please use find_helpful_skills to find valid skill names.",
                 )
             ]
+            
+        if "Skill.md" in str(document_path):
+                return [
+                    TextContent(
+                        type="text",
+                        text=f"Skill '{skill_name}' Skill.md already provided.",
+                    )
+                ]
+            
 
         # If no document_path provided, list all available documents
         if not document_path:
