@@ -18,7 +18,7 @@ RUN cd /opt/app-root/src/ && uv pip install .
 
 RUN mkdir -p /opt/app-root/src/local_skills
 
-COPY ./local-skills/ /opt/app-root/src/embed_skills
+# COPY ./local-skills/ /opt/app-root/src/embed_skills
 
 COPY config-container.json /opt/app-root/src/
 

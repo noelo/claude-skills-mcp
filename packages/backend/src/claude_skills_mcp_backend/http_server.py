@@ -20,7 +20,8 @@ from .scheduler import HourlyScheduler
 logger = logging.getLogger(__name__)
 
 # Create FastMCP server
-mcp = FastMCP("claude-skills-mcp-backend")
+mcp = FastMCP("skills-mcp-backend")
+
 
 # Global state
 search_engine: SkillSearchEngine | None = None
@@ -79,11 +80,11 @@ def register_mcp_tools(default_top_k: int = 3, max_content_chars: int | None = N
         name="find_helpful_skills",
         title="Find the most helpful skill for any task",
         description=(
-            "Always call this tool FIRST whenever the question requires any domain-specific knowledge "
-            "beyond common sense or simple recall. Use it at task start, regardless of the task and whether "
-            "you are sure about the task, It performs semantic search over a curated library of proven skills "
-            "and returns ranked candidates with step-by-step guidance and best practices. Do this before any "
-            "searches, coding, or any other actions as this will inform you about the best approach to take."
+                        "Always call this tool FIRST whenever the question or task requires any domain-specific knowledge."
+                        "Use it at task start, regardless of the task and whether you are sure about how to fulfill the task."
+                        "It performs semantic search over a curated library of proven skills "
+                        "and returns ranked candidates with step-by-step guidance and best practices. Do this before any "
+                        "searches, coding, or any other actions as this will inform you about the best approach to take."
         )
     )
     async def find_helpful_skills(
@@ -200,7 +201,7 @@ async def initialize_backend(config_path: str | None = None, verbose: bool = Fal
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     )
 
-    logger.info("Initializing Claude Skills MCP Backend")
+    logger.info("Initializing Skills MCP Backend ")
 
     # Load configuration
     config = load_config(config_path)
@@ -330,6 +331,7 @@ async def run_server(
 ):
     """Run the HTTP server using FastMCP with custom routes."""
     # Initialize backend (search engine, skills, etc.)
+    print("Logging=",verbose)
     await initialize_backend(config_path, verbose)
 
     # Get FastMCP's ASGI app (includes /mcp route internally)

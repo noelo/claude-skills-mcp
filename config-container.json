@@ -11,14 +11,14 @@
       "comment": "A Claude skill for d3.js."
     },
     {
-      "type": "local",
-      "path": "/opt/app-root/src/embed_skills",
-      "comment": "Embedded local skills"
+      "type": "github",
+      "url": "https://github.com/noelo/brand-skill",
+      "comment": "Demo RH brand skill"
     },
     {
       "type": "local",
-      "path": "/opt/app-root/src/local_skills",
-      "comment": "Your custom local skills via volumn mounts"
+      "path": "/opt/app-root/src/embed_skills",
+      "comment": "Embedded local skills"
     }
   ],
   "embedding_model": "all-MiniLM-L6-v2",

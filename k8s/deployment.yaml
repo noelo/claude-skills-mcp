@@ -9,11 +9,6 @@ data:
     {
       "skill_sources": [
         {
-          "type": "local",
-          "path": "/opt/app-root/src/local_skills",
-          "comment": "Your custom local skills (optional - directory doesn't need to exist)"
-        },
-        {
           "type": "github",
           "url": "https://github.com/anthropics/skills",
           "comment": "Official Anthropic skills - diverse examples with Python scripts, images, documents"
@@ -24,14 +19,14 @@ data:
           "comment": "A Claude skill for d3.js."
         },
         {
-          "type": "local",
-          "path": "/opt/app-root/src/embed_skills",
-          "comment": "Embedded local skills"
+          "type": "github",
+          "url": "https://github.com/noelo/brand-skill",
+          "comment": "Demo RH brand skill"
         },
         {
           "type": "local",
-          "path": "/opt/app-root/src/local_skills",
-          "comment": "Your custom local skills via volume mounts"
+          "path": "/opt/app-root/src/embed_skills",
+          "comment": "Embedded local skills"
         } 
       ],
       "embedding_model": "all-MiniLM-L6-v2",
@@ -80,7 +75,7 @@ spec:
       containers:
         - name: backend
           # Update this image to match your container registry
-          image: quay.io/noeloc/skills-mcp:1630
+          image: quay.io/noeloc/skills-mcp:1816
           imagePullPolicy: Always
           ports:
             - name: http

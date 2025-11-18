@@ -3,6 +3,7 @@
 import argparse
 import asyncio
 import sys
+import logging
 
 from .http_server import run_server
 from .config import get_example_config
@@ -17,7 +18,7 @@ def parse_args() -> argparse.Namespace:
         Parsed arguments.
     """
     parser = argparse.ArgumentParser(
-        description="Claude Skills MCP Backend - Streamable HTTP Server",
+        description="Skills MCP Backend - Streamable HTTP Server",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
@@ -79,6 +80,8 @@ async def main_async() -> None:
     if args.example_config:
         print(get_example_config())
         return
+    
+    print("here...")
 
     # Run the HTTP server
     await run_server(
@@ -88,6 +91,7 @@ async def main_async() -> None:
 
 def main() -> None:
     """Main entry point."""
+    logger = logging.getLogger(__name__)
     try:
         asyncio.run(main_async())
     except KeyboardInterrupt:

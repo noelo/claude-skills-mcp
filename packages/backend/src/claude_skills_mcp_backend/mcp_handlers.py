@@ -92,7 +92,7 @@ class LoadingState:
 
 
 class SkillsMCPServer:
-    """MCP Server for searching Claude Agent Skills.
+    """MCP Server for searching Agent Skills.
 
     Attributes
     ----------
@@ -130,7 +130,7 @@ class SkillsMCPServer:
         self.loading_state = loading_state
         self.default_top_k = default_top_k
         self.max_content_chars = max_content_chars
-        self.server = Server("claude-skills-mcp")
+        self.server = Server("skills-mcp")
 
         # Register handlers
         self._register_handlers()
@@ -148,12 +148,12 @@ class SkillsMCPServer:
                     name="find_helpful_skills",
                     title="Find the most helpful skill for any task",
                     description=(
-                        "Always call this tool FIRST whenever the question requires any domain-specific knowledge "
-                        "beyond common sense or simple recall. Use it at task start, regardless of the task and whether "
-                        "you are sure about the task, It performs semantic search over a curated library of proven skills "
+                        "Always call this tool FIRST whenever the question or task requires any domain-specific knowledge."
+                        "Use it at task start, regardless of the task and whether you are sure about how to fulfill the task."
+                        "It performs semantic search over a curated library of proven skills "
                         "and returns ranked candidates with step-by-step guidance and best practices. Do this before any "
                         "searches, coding, or any other actions as this will inform you about the best approach to take."
-                    ),
+                    ),                    
                     inputSchema={
                         "type": "object",
                         "properties": {
@@ -235,6 +235,7 @@ class SkillsMCPServer:
         @self.server.call_tool()
         async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
             """Handle tool calls."""
+            print("call_tool ",name,arguments)
             if name == "find_helpful_skills":
                 return await self._handle_search_skills(arguments)
             elif name == "read_skill_document":
@@ -259,6 +260,7 @@ class SkillsMCPServer:
         list[TextContent]
             Formatted search results.
         """
+        logger.info("_handle_search_skills ",arguments)
         task_description = arguments.get("task_description")
         if not task_description:
             raise ValueError("task_description is required")
@@ -366,6 +368,7 @@ class SkillsMCPServer:
         list[TextContent]
             Document content or list of documents.
         """
+        logger.info("_handle_read_skill_document ",arguments)
         skill_name = arguments.get("skill_name")
         if not skill_name:
             raise ValueError("skill_name is required")
@@ -388,13 +391,13 @@ class SkillsMCPServer:
                 )
             ]
             
-        if "Skill.md" in str(document_path):
-                return [
-                    TextContent(
-                        type="text",
-                        text=f"Skill '{skill_name}' Skill.md already provided.",
-                    )
-                ]
+        # if "Skill.md" in str(document_path):
+        #         return [
+        #             TextContent(
+        #                 type="text",
+        #                 text=f"Skill '{skill_name}' Skill.md already provided.",
+        #             )
+        #         ]
             
 
         # If no document_path provided, list all available documents
@@ -526,6 +529,7 @@ class SkillsMCPServer:
         list[TextContent]
             Complete list of all skills with metadata.
         """
+        logger.info("_handle_list_skills ",arguments)
         response_parts = []
 
         # Add loading status if skills are still being loaded
@@ -702,6 +706,9 @@ async def handle_read_skill_document(
                 text=f"Skill '{skill_name}' not found. Please use find_helpful_skills to find valid skill names.",
             )
         ]
+        
+    if str(document_path).lower()=="skill.md":
+        return [TextContent(type="text", text=skill.content)]        
 
     # If no document_path provided, list all available documents
     if not document_path:
