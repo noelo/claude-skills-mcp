@@ -309,7 +309,7 @@ class SkillsMCPServer:
             response_parts.append(f"\n{'=' * 80}")
             response_parts.append(f"\nSkill {i}: {result['name']}")
             response_parts.append(f"\nRelevance Score: {result['relevance_score']:.4f}")
-            response_parts.append(f"\nSource: {result['source']}")
+            # response_parts.append(f"\nSource: {result['source']}")
             response_parts.append(f"\nDescription: {result['description']}")
 
             # Include document count if available
@@ -350,6 +350,8 @@ class SkillsMCPServer:
                 response_parts.append(content)
 
             response_parts.append(f"\n{'=' * 80}\n")
+
+        print("response_parts....",response_parts)
 
         return [TextContent(type="text", text="\n".join(response_parts))]
 
@@ -642,7 +644,7 @@ async def handle_search_skills(
         response_parts.append(f"\n{'=' * 80}")
         response_parts.append(f"\nSkill {i}: {result['name']}")
         response_parts.append(f"\nRelevance Score: {result['relevance_score']:.4f}")
-        response_parts.append(f"\nSource: {result['source']}")
+        # response_parts.append(f"\nSource: {result['source']}")
         response_parts.append(f"\nDescription: {result['description']}")
 
         documents = result.get("documents", {})

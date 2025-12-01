@@ -4,6 +4,8 @@ import argparse
 import asyncio
 import sys
 import logging
+from pathlib import Path
+import os
 
 from .http_server import run_server
 from .config import get_example_config
@@ -81,8 +83,6 @@ async def main_async() -> None:
         print(get_example_config())
         return
     
-    print("here...")
-
     # Run the HTTP server
     await run_server(
         host=args.host, port=args.port, config_path=args.config, verbose=args.verbose
@@ -91,7 +91,7 @@ async def main_async() -> None:
 
 def main() -> None:
     """Main entry point."""
-    logger = logging.getLogger(__name__)
+    print("Starting Skills MCP Backend server")
     try:
         asyncio.run(main_async())
     except KeyboardInterrupt:
@@ -103,4 +103,5 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    print("Starting Skills MCP Backend server...")
     main()

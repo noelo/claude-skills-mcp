@@ -171,3 +171,17 @@ Copyright 2025 K-Dense AI (https://k-dense.ai)
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=K-Dense-AI/claude-skills-mcp&type=date&legend=top-left)](https://www.star-history.com/#K-Dense-AI/claude-skills-mcp&type=date&legend=top-left)
+
+
+
+### Local Running/Debug
+
+```
+uv run claude-skills-mcp-backend --config ../../config-container.json
+```
+
+### Podman 
+```
+podman build -f Containerfile -t quay.io/noeloc/skills-mcp:1637
+podman run --rm -it -p 8765:8765 quay.io/noeloc/skills-mcp:1637
+```

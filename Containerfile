@@ -34,5 +34,5 @@ EXPOSE 8765
 # Run backend server
 # Default: local access (127.0.0.1)
 # For remote access, override with: --host 0.0.0.0
-# ENTRYPOINT ["claude-skills-mcp-backend"]
-CMD exec /opt/app-root/bin/claude-skills-mcp-backend --host 0.0.0.0 --port 8765 --verbose --config $CONFIG_FILE
+# ENTRYPOINT ["claude-skills-mcp-backend","--host","0.0.0.0", "--port","8765","--verbose", "--config","$CONFIG_FILE"]
+CMD claude-skills-mcp-backend --host 0.0.0.0 --port 8765 --verbose --config $CONFIG_FILE
